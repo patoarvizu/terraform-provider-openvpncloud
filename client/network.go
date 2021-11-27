@@ -12,7 +12,7 @@ type Network struct {
 	Name           string      `json:"name"`
 	Description    string      `json:"description"`
 	Egress         bool        `json:"egress"`
-	InternetAccess string      `json:"internetAcess"`
+	InternetAccess string      `json:"internetAccess"`
 	SystemSubnets  []string    `json:"systemSubnets"`
 	Routes         []Route     `json:"routes"`
 	Connectors     []Connector `json:"connectors"`
@@ -65,4 +65,17 @@ func (c *Client) CreateNetwork(network Network) (*Network, error) {
 		return nil, err
 	}
 	return &n, nil
+}
+
+func (c *Client) UpdateNetwork(network Network) error {
+	networkJson, err := json.Marshal(network)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/api/beta/networks/%s", c.BaseURL, network.Id), bytes.NewBuffer(networkJson))
+	if err != nil {
+		return err
+	}
+	_, err = c.DoRequest(req)
+	return err
 }

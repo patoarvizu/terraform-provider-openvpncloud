@@ -22,17 +22,21 @@ func resourceNetwork() *schema.Resource {
 				Optional: true,
 			},
 			"description": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "Managed by Terraform",
+				ValidateFunc: validation.StringLenBetween(1, 120),
 			},
 			"egress": {
 				Type:     schema.TypeBool,
 				Optional: true,
+				Default:  true,
 			},
 			"internet_access": {
 				Type:         schema.TypeString,
-				ValidateFunc: validation.StringInSlice([]string{client.InternetAccessBlocked, client.InternetAccessGlobalInternet, client.InternetAccessLocal}, false),
 				Optional:     true,
+				Default:      client.InternetAccessLocal,
+				ValidateFunc: validation.StringInSlice([]string{client.InternetAccessBlocked, client.InternetAccessGlobalInternet, client.InternetAccessLocal}, false),
 			},
 			"system_subnets": {
 				Type:     schema.TypeSet,
@@ -228,6 +232,22 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		err := c.UpdateRoute(networkId, route)
 		if err != nil {
 			diags = append(diags, diag.FromErr(err)...)
+		}
+	}
+	if d.HasChanges("name", "description", "internet_access", "egress") {
+		_, newName := d.GetChange("name")
+		_, newDescription := d.GetChange("description")
+		_, newEgress := d.GetChange("egress")
+		_, newAccess := d.GetChange("internet_access")
+		err := c.UpdateNetwork(client.Network{
+			Id:             d.Id(),
+			Name:           newName.(string),
+			Description:    newDescription.(string),
+			Egress:         newEgress.(bool),
+			InternetAccess: newAccess.(string),
+		})
+		if err != nil {
+			return append(diags, diag.FromErr(err)...)
 		}
 	}
 	return append(diags, resourceNetworkRead(ctx, d, m)...)
