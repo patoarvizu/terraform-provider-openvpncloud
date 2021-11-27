@@ -197,8 +197,8 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 	if d.HasChange("default_connector") {
 		o, n := d.GetChange("default_connector")
-		old := o.(*schema.Set).List()[0].(map[string]interface{})
-		new := n.(*schema.Set).List()[0].(map[string]interface{})
+		old := o.([]interface{})[0].(map[string]interface{})
+		new := n.([]interface{})[0].(map[string]interface{})
 		if old["name"].(string) != new["name"].(string) || old["vpn_region_id"].(string) != new["vpn_region_id"].(string) {
 			newConnector := client.Connector{
 				Name:        new["name"].(string),
