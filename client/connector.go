@@ -44,6 +44,29 @@ func (c *Client) GetConnectorByName(name string) (*Connector, error) {
 	return nil, nil
 }
 
+func (c *Client) GetConnectorsForNetwork(networkId string) ([]Connector, error) {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/connectors", c.BaseURL), nil)
+	if err != nil {
+		return nil, err
+	}
+	body, err := c.DoRequest(req)
+	if err != nil {
+		return nil, err
+	}
+	var connectors []Connector
+	err = json.Unmarshal(body, &connectors)
+	if err != nil {
+		return nil, err
+	}
+	var networkConnectors []Connector
+	for _, v := range connectors {
+		if v.NetworkItemId == networkId {
+			networkConnectors = append(networkConnectors, v)
+		}
+	}
+	return networkConnectors, nil
+}
+
 func (c *Client) AddNetworkConnector(connector Connector, networkId string) (*Connector, error) {
 	connectorJson, err := json.Marshal(connector)
 	if err != nil {
