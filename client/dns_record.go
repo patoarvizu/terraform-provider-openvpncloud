@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -55,7 +54,7 @@ func (c *Client) GetDnsRecord(recordId string) (*DnsRecord, error) {
 			return &r, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("Route with id %s was not found", recordId))
+	return nil, nil
 }
 
 func (c *Client) UpdateDnsRecord(record DnsRecord) error {

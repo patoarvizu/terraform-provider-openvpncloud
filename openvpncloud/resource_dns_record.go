@@ -76,9 +76,13 @@ func resourceDnsRecordRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
-	d.Set("domain", r.Domain)
-	d.Set("ip_v4_addresses", r.IPV4Addresses)
-	d.Set("ip_v6_addresses", r.IPV6Addresses)
+	if r == nil {
+		d.SetId("")
+	} else {
+		d.Set("domain", r.Domain)
+		d.Set("ip_v4_addresses", r.IPV4Addresses)
+		d.Set("ip_v6_addresses", r.IPV6Addresses)
+	}
 	return diags
 }
 
