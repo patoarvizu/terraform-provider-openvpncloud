@@ -25,7 +25,7 @@ const (
 	InternetAccessLocal          = "LOCAL"
 )
 
-func (c *Client) GetNetwork(name string) (*Network, error) {
+func (c *Client) GetNetworkByName(name string) (*Network, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/networks", c.BaseURL), nil)
 	if err != nil {
 		return nil, err

@@ -101,7 +101,7 @@ func dataSourceNetwork() *schema.Resource {
 func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	network, err := c.GetNetwork(d.Get("name").(string))
+	network, err := c.GetNetworkByName(d.Get("name").(string))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
