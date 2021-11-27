@@ -37,7 +37,7 @@ func Provider() *schema.Provider {
 			"openvpncloud_network":    resourceNetwork(),
 			"openvpncloud_connector":  resourceConnector(),
 			"openvpncloud_route":      resourceRoute(),
-			"openvpncloud_dns_record": resourceDNSRecord(),
+			"openvpncloud_dns_record": resourceDnsRecord(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"openvpncloud_network":        dataSourceNetwork(),

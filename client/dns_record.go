@@ -8,14 +8,14 @@ import (
 	"net/http"
 )
 
-type DNSRecord struct {
+type DnsRecord struct {
 	Id            string   `json:"id"`
 	Domain        string   `json:"domain"`
 	IPV4Addresses []string `json:"ipv4Addresses"`
 	IPV6Addresses []string `json:"ipv6Addresses"`
 }
 
-func (c *Client) CreateDNSRecord(record DNSRecord) (*DNSRecord, error) {
+func (c *Client) CreateDnsRecord(record DnsRecord) (*DnsRecord, error) {
 	recordJson, err := json.Marshal(record)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (c *Client) CreateDNSRecord(record DNSRecord) (*DNSRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	var d DNSRecord
+	var d DnsRecord
 	err = json.Unmarshal(body, &d)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (c *Client) CreateDNSRecord(record DNSRecord) (*DNSRecord, error) {
 	return &d, nil
 }
 
-func (c *Client) GetDNSRecord(recordId string) (*DNSRecord, error) {
+func (c *Client) GetDnsRecord(recordId string) (*DnsRecord, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/dns-records", c.BaseURL), nil)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (c *Client) GetDNSRecord(recordId string) (*DNSRecord, error) {
 	if err != nil {
 		return nil, err
 	}
-	var records []DNSRecord
+	var records []DnsRecord
 	err = json.Unmarshal(body, &records)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (c *Client) GetDNSRecord(recordId string) (*DNSRecord, error) {
 	return nil, errors.New(fmt.Sprintf("Route with id %s was not found", recordId))
 }
 
-func (c *Client) UpdateDNSRecord(record DNSRecord) error {
+func (c *Client) UpdateDnsRecord(record DnsRecord) error {
 	recordJson, err := json.Marshal(record)
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func (c *Client) UpdateDNSRecord(record DNSRecord) error {
 	return err
 }
 
-func (c *Client) DeleteDNSRecord(recordId string) error {
+func (c *Client) DeleteDnsRecord(recordId string) error {
 	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/beta/dns-records/%s", c.BaseURL, recordId), nil)
 	if err != nil {
 		return err

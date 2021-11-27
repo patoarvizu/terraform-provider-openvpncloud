@@ -9,12 +9,12 @@ import (
 	"github.com/patoarvizu/terraform-provider-openvpn-cloud/client"
 )
 
-func resourceDNSRecord() *schema.Resource {
+func resourceDnsRecord() *schema.Resource {
 	return &schema.Resource{
-		CreateContext: resourceDNSRecordCreate,
-		ReadContext:   resourceDNSRecordRead,
-		DeleteContext: resourceDNSRecordDelete,
-		UpdateContext: resourceDNSRecordUpdate,
+		CreateContext: resourceDnsRecordCreate,
+		ReadContext:   resourceDnsRecordRead,
+		DeleteContext: resourceDnsRecordDelete,
+		UpdateContext: resourceDnsRecordUpdate,
 		Schema: map[string]*schema.Schema{
 			"domain": {
 				Type:     schema.TypeString,
@@ -41,7 +41,7 @@ func resourceDNSRecord() *schema.Resource {
 	}
 }
 
-func resourceDNSRecordCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceDnsRecordCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	domain := d.Get("domain").(string)
@@ -55,12 +55,12 @@ func resourceDNSRecordCreate(ctx context.Context, d *schema.ResourceData, m inte
 	for _, a := range ipV6Addresses {
 		ipV6AddressesSlice = append(ipV6AddressesSlice, a.(string))
 	}
-	dr := client.DNSRecord{
+	dr := client.DnsRecord{
 		Domain:        domain,
 		IPV4Addresses: ipV4AddressesSlice,
 		IPV6Addresses: ipV6AddressesSlice,
 	}
-	dnsRecord, err := c.CreateDNSRecord(dr)
+	dnsRecord, err := c.CreateDnsRecord(dr)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
@@ -68,11 +68,11 @@ func resourceDNSRecordCreate(ctx context.Context, d *schema.ResourceData, m inte
 	return diags
 }
 
-func resourceDNSRecordRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceDnsRecordRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	recordId := d.Id()
-	r, err := c.GetDNSRecord(recordId)
+	r, err := c.GetDnsRecord(recordId)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
@@ -82,7 +82,7 @@ func resourceDNSRecordRead(ctx context.Context, d *schema.ResourceData, m interf
 	return diags
 }
 
-func resourceDNSRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceDnsRecordUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	_, domain := d.GetChange("domain")
@@ -96,24 +96,24 @@ func resourceDNSRecordUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	for _, a := range ipV6Addresses.([]interface{}) {
 		ipV6AddressesSlice = append(ipV6AddressesSlice, a.(string))
 	}
-	dr := client.DNSRecord{
+	dr := client.DnsRecord{
 		Id:            d.Id(),
 		Domain:        domain.(string),
 		IPV4Addresses: ipV4AddressesSlice,
 		IPV6Addresses: ipV6AddressesSlice,
 	}
-	err := c.UpdateDNSRecord(dr)
+	err := c.UpdateDnsRecord(dr)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
 	return diags
 }
 
-func resourceDNSRecordDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceDnsRecordDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	routeId := d.Id()
-	err := c.DeleteDNSRecord(routeId)
+	err := c.DeleteDnsRecord(routeId)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
