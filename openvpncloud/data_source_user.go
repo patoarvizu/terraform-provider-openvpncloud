@@ -85,9 +85,13 @@ func dataSourceUser() *schema.Resource {
 func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	user, err := c.GetUser(d.Get("username").(string), d.Get("role").(string))
+	userName := d.Get("username").(string)
+	user, err := c.GetUser(userName, d.Get("role").(string))
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
+	}
+	if user == nil {
+		return append(diags, diag.Errorf("User with name %s was not found", userName)...)
 	}
 	d.Set("user_id", user.Id)
 	d.Set("username", user.Username)
