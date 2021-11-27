@@ -65,7 +65,7 @@ func resourceNetwork() *schema.Resource {
 				},
 			},
 			"default_connector": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Required: true,
 				MaxItems: 1,
 				Elem: &schema.Resource{
@@ -108,11 +108,11 @@ func resourceNetwork() *schema.Resource {
 func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	configConnector := d.Get("default_connector").(*schema.Set)
+	configConnector := d.Get("default_connector").([]interface{})[0].(map[string]interface{})
 	connectors := []client.Connector{
 		{
-			Name:        configConnector.List()[0].(map[string]interface{})["name"].(string),
-			VpnRegionId: configConnector.List()[0].(map[string]interface{})["vpn_region_id"].(string),
+			Name:        configConnector["name"].(string),
+			VpnRegionId: configConnector["vpn_region_id"].(string),
 		},
 	}
 	n := client.Network{
@@ -155,10 +155,17 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	d.Set("egress", network.Egress)
 	d.Set("internet_access", network.InternetAccess)
 	d.Set("system_subnets", network.SystemSubnets)
-	connector := d.Get("default_connector").(*schema.Set).List()[0].(map[string]interface{})
-	connectorName := connector["name"].(string)
-	conns := getSingleNetworkConnector(c, network.Id, connectorName)
-	d.Set("default_connector", conns)
+	configConnector := d.Get("default_connector").([]interface{})[0].(map[string]interface{})
+	connectorName := configConnector["name"].(string)
+	networkConnectors, err := c.GetConnectorsForNetwork(network.Id)
+	if err != nil {
+		return append(diags, diag.FromErr(err)...)
+	}
+	conns := getSingleNetworkConnector(networkConnectors, network.Id, connectorName)
+	err = d.Set("default_connector", conns)
+	if err != nil {
+		return append(diags, diag.FromErr(err)...)
+	}
 	configRoute := d.Get("default_route").([]interface{})[0].(map[string]interface{})
 	route, err := c.GetRoute(d.Id(), configRoute["id"].(string))
 	defaultRoute := []map[string]interface{}{
@@ -172,7 +179,10 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	} else if route.Type == client.RouteTypeDomain {
 		defaultRoute[0]["value"] = route.Domain
 	}
-	d.Set("default_route", defaultRoute)
+	err = d.Set("default_route", defaultRoute)
+	if err != nil {
+		return append(diags, diag.FromErr(err)...)
+	}
 	return diags
 }
 
@@ -229,9 +239,8 @@ func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, m interf
 	return diags
 }
 
-func getSingleNetworkConnector(c *client.Client, networkId string, connectorName string) *schema.Set {
-	connectorsSet := schema.NewSet(connectorsHash, []interface{}{})
-	networkConnectors, _ := c.GetConnectorsForNetwork(networkId)
+func getSingleNetworkConnector(networkConnectors []client.Connector, networkId string, connectorName string) []interface{} {
+	connectorsList := make([]interface{}, 1)
 	for _, c := range networkConnectors {
 		if c.NetworkItemId == networkId && c.Name == connectorName {
 			connector := make(map[string]interface{})
@@ -242,11 +251,11 @@ func getSingleNetworkConnector(c *client.Client, networkId string, connectorName
 			connector["vpn_region_id"] = c.VpnRegionId
 			connector["ip_v4_address"] = c.IPv4Address
 			connector["ip_v6_address"] = c.IPv6Address
-			connectorsSet.Add(connector)
+			connectorsList[0] = connector
 			break
 		}
 	}
-	return connectorsSet
+	return connectorsList
 }
 
 func connectorsHash(v interface{}) int {
