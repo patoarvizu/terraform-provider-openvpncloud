@@ -44,7 +44,7 @@ func dataSourceConnector() *schema.Resource {
 func dataSourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	connector, err := c.GetConnector(d.Get("name").(string))
+	connector, err := c.GetConnectorByName(d.Get("name").(string))
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,

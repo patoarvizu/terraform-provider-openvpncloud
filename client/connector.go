@@ -22,7 +22,7 @@ const (
 	NetworkItemTypeNetwork = "NETWORK"
 )
 
-func (c *Client) GetConnector(name string) (*Connector, error) {
+func (c *Client) GetConnectorByName(name string) (*Connector, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/connectors", c.BaseURL), nil)
 	if err != nil {
 		return nil, err
