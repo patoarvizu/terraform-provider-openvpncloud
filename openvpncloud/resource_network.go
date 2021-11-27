@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"hash/crc32"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -169,8 +168,7 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
-	conns := getSingleNetworkConnector(networkConnectors, network.Id, connectorName)
-	err = d.Set("default_connector", conns)
+	err = d.Set("default_connector", getNetworkConnectorSlice(networkConnectors, network.Id, connectorName))
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
@@ -263,7 +261,7 @@ func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, m interf
 	return diags
 }
 
-func getSingleNetworkConnector(networkConnectors []client.Connector, networkId string, connectorName string) []interface{} {
+func getNetworkConnectorSlice(networkConnectors []client.Connector, networkId string, connectorName string) []interface{} {
 	connectorsList := make([]interface{}, 1)
 	for _, c := range networkConnectors {
 		if c.NetworkItemId == networkId && c.Name == connectorName {
@@ -280,29 +278,4 @@ func getSingleNetworkConnector(networkConnectors []client.Connector, networkId s
 		}
 	}
 	return connectorsList
-}
-
-func connectorsHash(v interface{}) int {
-	m, ok := v.(map[string]interface{})
-
-	if !ok {
-		return 0
-	}
-
-	if v, ok := m["name"].(string); ok {
-		return stringHashcode(v)
-	}
-
-	return 0
-}
-
-func stringHashcode(s string) int {
-	v := int(crc32.ChecksumIEEE([]byte(s)))
-	if v >= 0 {
-		return v
-	}
-	if -v >= 0 {
-		return -v
-	}
-	return 0
 }
