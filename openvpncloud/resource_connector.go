@@ -2,6 +2,7 @@ package openvpncloud
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -15,10 +16,6 @@ func resourceConnector() *schema.Resource {
 		ReadContext:   resourceConnectorRead,
 		DeleteContext: resourceConnectorDelete,
 		Schema: map[string]*schema.Schema{
-			"id": {
-				Type:     schema.TypeString,
-				Computed: true,
-			},
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -80,20 +77,28 @@ func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interf
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
-	d.Set("id", connector.Id)
-	d.Set("name", connector.Name)
-	d.Set("vpn_region_id", connector.VpnRegionId)
-	d.Set("network_item_type", connector.NetworkItemType)
-	d.Set("network_item_id", connector.NetworkItemId)
-	d.Set("ip_v4_address", connector.IPv4Address)
-	d.Set("ip_v6_address", connector.IPv6Address)
+	if connector == nil {
+		d.SetId("")
+		return append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  fmt.Sprintf("Connector with name %s not found", d.Get("name").(string)),
+		})
+	} else {
+		d.SetId(connector.Id)
+		d.Set("name", connector.Name)
+		d.Set("vpn_region_id", connector.VpnRegionId)
+		d.Set("network_item_type", connector.NetworkItemType)
+		d.Set("network_item_id", connector.NetworkItemId)
+		d.Set("ip_v4_address", connector.IPv4Address)
+		d.Set("ip_v6_address", connector.IPv6Address)
+	}
 	return diags
 }
 
 func resourceConnectorDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	err := c.DeleteNetworkConnector(d.Get("id").(string), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
+	err := c.DeleteNetworkConnector(d.Id(), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
