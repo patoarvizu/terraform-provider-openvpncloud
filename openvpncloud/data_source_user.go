@@ -98,12 +98,12 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	d.Set("last_name", user.LastName)
 	d.Set("group_id", user.GroupId)
 	d.Set("status", user.Status)
-	d.Set("devices", getUserDevices(&user.Devices))
+	d.Set("devices", getUserDevicesSlice(&user.Devices))
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return diags
 }
 
-func getUserDevices(userDevices *[]client.Device) []interface{} {
+func getUserDevicesSlice(userDevices *[]client.Device) []interface{} {
 	devices := make([]interface{}, len(*userDevices), len(*userDevices))
 	for i, d := range *userDevices {
 		device := make(map[string]interface{})
