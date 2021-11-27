@@ -150,6 +150,10 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
+	if network == nil {
+		d.SetId("")
+		return diags
+	}
 	d.Set("name", network.Name)
 	d.Set("description", network.Description)
 	d.Set("egress", network.Egress)

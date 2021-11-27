@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -44,7 +43,7 @@ func (c *Client) GetNetworkByName(name string) (*Network, error) {
 			return &n, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("Network with name '%s' was not found", name))
+	return nil, nil
 }
 
 func (c *Client) CreateNetwork(network Network) (*Network, error) {

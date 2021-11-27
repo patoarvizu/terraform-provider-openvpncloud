@@ -100,9 +100,13 @@ func dataSourceNetwork() *schema.Resource {
 func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	network, err := c.GetNetworkByName(d.Get("name").(string))
+	networkName := d.Get("name").(string)
+	network, err := c.GetNetworkByName(networkName)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
+	}
+	if network == nil {
+		return append(diags, diag.Errorf("Network with name %s was not found", networkName)...)
 	}
 	d.Set("network_id", network.Id)
 	d.Set("name", network.Name)
