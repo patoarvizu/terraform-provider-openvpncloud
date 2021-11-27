@@ -41,9 +41,13 @@ func dataSourceVpnRegion() *schema.Resource {
 func dataSourceVpnRegionRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	vpnRegion, err := c.GetVpnRegion(d.Get("region_id").(string))
+	vpnRegionId := d.Get("region_id").(string)
+	vpnRegion, err := c.GetVpnRegion(vpnRegionId)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
+	}
+	if vpnRegion == nil {
+		return append(diags, diag.Errorf("VPN region with id %s was not found", vpnRegionId)...)
 	}
 	d.Set("region_id", vpnRegion.Id)
 	d.Set("continent", vpnRegion.Continent)
