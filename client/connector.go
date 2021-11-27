@@ -72,7 +72,7 @@ func (c *Client) AddNetworkConnector(connector Connector, networkId string) (*Co
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/api/beta/connectors?networkItemId=%s&networkItemType=NETWORK", c.BaseURL, networkId), bytes.NewBuffer(connectorJson))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/api/beta/connectors?networkItemId=%s&networkItemType=%s", c.BaseURL, networkId, connector.NetworkItemType), bytes.NewBuffer(connectorJson))
 	if err != nil {
 		return nil, err
 	}
@@ -85,8 +85,8 @@ func (c *Client) AddNetworkConnector(connector Connector, networkId string) (*Co
 	return &conn, nil
 }
 
-func (c *Client) RemoveNetworkConnector(connectorId string, networkId string) error {
-	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/beta/connectors/%s?networkItemId=%s&networkItemType=NETWORK", c.BaseURL, connectorId, networkId), nil)
+func (c *Client) DeleteNetworkConnector(connectorId string, networkId string, networkItemType string) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/beta/connectors/%s?networkItemId=%s&networkItemType=%s", c.BaseURL, connectorId, networkId, networkItemType), nil)
 	if err != nil {
 		return err
 	}

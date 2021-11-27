@@ -204,7 +204,7 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 					Summary:  fmt.Sprintf("Error adding connector %v", err),
 				})
 			}
-			err = c.RemoveNetworkConnector(old["id"].(string), d.Id())
+			err = c.DeleteNetworkConnector(old["id"].(string), d.Id(), old["network_item_type"].(string))
 			if err != nil {
 				diags = append(diags, diag.Diagnostic{
 					Severity: diag.Error,

@@ -98,7 +98,7 @@ func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interf
 func resourceConnectorDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	err := c.RemoveNetworkConnector(d.Get("id").(string), d.Get("network_item_id").(string))
+	err := c.DeleteNetworkConnector(d.Get("id").(string), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
 	if err != nil {
 		return append(diags, diag.Diagnostic{
 			Severity: diag.Error,
