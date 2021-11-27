@@ -67,13 +67,17 @@ func resourceRouteRead(ctx context.Context, d *schema.ResourceData, m interface{
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
-	d.Set("type", r.Type)
-	if r.Type == client.RouteTypeIPV4 || r.Type == client.RouteTypeIPV6 {
-		d.Set("subnet", r.Subnet)
-	} else if r.Type == client.RouteTypeDomain {
-		d.Set("domain", r.Domain)
+	if r == nil {
+		d.SetId("")
+	} else {
+		d.Set("type", r.Type)
+		if r.Type == client.RouteTypeIPV4 || r.Type == client.RouteTypeIPV6 {
+			d.Set("value", r.Subnet)
+		} else if r.Type == client.RouteTypeDomain {
+			d.Set("resourceRouteRead", r.Domain)
+		}
+		d.Set("network_item_id", networkItemId)
 	}
-	d.Set("network_item_id", networkItemId)
 	return diags
 }
 

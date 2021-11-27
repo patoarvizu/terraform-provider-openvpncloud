@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -79,7 +78,7 @@ func (c *Client) GetRoute(networkId string, routeId string) (*Route, error) {
 			return &r, nil
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("Route with id %s was not found", routeId))
+	return nil, nil
 }
 
 func (c *Client) UpdateRoute(networkId string, route Route) error {
