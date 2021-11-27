@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/patoarvizu/terraform-provider-openvpn-cloud/client"
 )
 
@@ -30,8 +31,9 @@ func resourceNetwork() *schema.Resource {
 				Optional: true,
 			},
 			"internet_access": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				ValidateFunc: validation.StringInSlice([]string{client.InternetAccessBlocked, client.InternetAccessGlobalInternet, client.InternetAccessLocal}, false),
+				Optional:     true,
 			},
 			"system_subnets": {
 				Type:     schema.TypeSet,
@@ -47,9 +49,10 @@ func resourceNetwork() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Default:  client.RouteTypeIPV4,
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      client.RouteTypeIPV4,
+							ValidateFunc: validation.StringInSlice([]string{client.RouteTypeIPV4, client.RouteTypeIPV6, client.RouteTypeDomain}, false),
 						},
 						"value": {
 							Type:     schema.TypeString,

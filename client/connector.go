@@ -17,6 +17,11 @@ type Connector struct {
 	IPv6Address     string `json:"ipV6Address"`
 }
 
+const (
+	NetworkItemTypeHost    = "HOST"
+	NetworkItemTypeNetwork = "NETWORK"
+)
+
 func (c *Client) GetConnector(name string) (*Connector, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/connectors", c.BaseURL), nil)
 	if err != nil {

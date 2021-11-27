@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"github.com/patoarvizu/terraform-provider-openvpn-cloud/client"
 )
 
@@ -30,9 +31,10 @@ func resourceConnector() *schema.Resource {
 				ForceNew: true,
 			},
 			"network_item_type": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringInSlice([]string{client.NetworkItemTypeHost, client.NetworkItemTypeNetwork}, false),
 			},
 			"network_item_id": {
 				Type:     schema.TypeString,
