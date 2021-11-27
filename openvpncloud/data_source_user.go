@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -88,12 +87,7 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	var diags diag.Diagnostics
 	user, err := c.GetUser(d.Get("username").(string), d.Get("role").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting users",
-			Detail:   fmt.Sprintf("Error requesting users %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("user_id", user.Id)
 	d.Set("username", user.Username)

@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -79,11 +78,7 @@ func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 	connector, err := c.GetConnectorByName(d.Get("name").(string))
 	if err != nil {
-		return append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting connector",
-			Detail:   fmt.Sprintf("Error requesting connector %v", err),
-		})
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("id", connector.Id)
 	d.Set("name", connector.Name)
@@ -100,11 +95,7 @@ func resourceConnectorDelete(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	err := c.DeleteNetworkConnector(d.Get("id").(string), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
 	if err != nil {
-		return append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error deleting connector",
-			Detail:   fmt.Sprintf("Error deleting connector %v", err),
-		})
+		return append(diags, diag.FromErr(err)...)
 	}
 	return diags
 }

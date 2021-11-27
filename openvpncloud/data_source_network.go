@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -103,12 +102,7 @@ func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 	network, err := c.GetNetworkByName(d.Get("name").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting network",
-			Detail:   fmt.Sprintf("Error requesting network %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("network_id", network.Id)
 	d.Set("name", network.Name)

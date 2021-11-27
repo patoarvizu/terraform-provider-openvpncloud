@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -44,12 +43,7 @@ func dataSourceVpnRegionRead(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	vpnRegion, err := c.GetVpnRegion(d.Get("region_id").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting VPN regions",
-			Detail:   fmt.Sprintf("Error requesting VPN regions %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("region_id", vpnRegion.Id)
 	d.Set("continent", vpnRegion.Continent)

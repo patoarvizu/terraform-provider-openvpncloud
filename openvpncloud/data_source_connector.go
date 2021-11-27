@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -46,12 +45,7 @@ func dataSourceConnectorRead(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	connector, err := c.GetConnectorByName(d.Get("name").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting connector",
-			Detail:   fmt.Sprintf("Error requesting connector %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("name", connector.Name)
 	d.Set("network_item_id", connector.NetworkItemId)

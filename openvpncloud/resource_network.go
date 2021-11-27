@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 	"hash/crc32"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -149,12 +148,7 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	var diags diag.Diagnostics
 	network, err := c.GetNetworkByName(d.Get("name").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting network",
-			Detail:   fmt.Sprintf("Error requesting network %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	d.Set("name", network.Name)
 	d.Set("description", network.Description)
@@ -178,10 +172,7 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	} else if route.Type == client.RouteTypeDomain {
 		defaultRoute[0]["value"] = route.Domain
 	}
-	err = d.Set("default_route", defaultRoute)
-	if err != nil {
-		return append(diags, diag.FromErr(err)...)
-	}
+	d.Set("default_route", defaultRoute)
 	return diags
 }
 
@@ -199,17 +190,11 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 			}
 			_, err := c.AddNetworkConnector(newConnector, d.Id())
 			if err != nil {
-				diags = append(diags, diag.Diagnostic{
-					Severity: diag.Error,
-					Summary:  fmt.Sprintf("Error adding connector %v", err),
-				})
+				return append(diags, diag.FromErr(err)...)
 			}
 			err = c.DeleteNetworkConnector(old["id"].(string), d.Id(), old["network_item_type"].(string))
 			if err != nil {
-				diags = append(diags, diag.Diagnostic{
-					Severity: diag.Error,
-					Summary:  fmt.Sprintf("Error removing connector: %v", err),
-				})
+				return append(diags, diag.FromErr(err)...)
 			}
 		}
 	}

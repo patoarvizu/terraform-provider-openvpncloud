@@ -54,12 +54,7 @@ func dataSourceUserGroupRead(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	userGroup, err := c.GetUserGroup(d.Get("name").(string))
 	if err != nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Error requesting user group",
-			Detail:   fmt.Sprintf("Error requesting user group %v", err),
-		})
-		return diags
+		return append(diags, diag.FromErr(err)...)
 	}
 	if userGroup == nil {
 		diags = append(diags, diag.Diagnostic{
