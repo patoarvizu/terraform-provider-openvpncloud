@@ -2,6 +2,8 @@ package openvpncloud
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -53,6 +55,6 @@ func dataSourceConnectorRead(ctx context.Context, d *schema.ResourceData, m inte
 	d.Set("vpn_region_id", connector.VpnRegionId)
 	d.Set("ip_v4_address", connector.IPv4Address)
 	d.Set("ip_v6_address", connector.IPv6Address)
-	d.SetId(connector.Id)
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return diags
 }
