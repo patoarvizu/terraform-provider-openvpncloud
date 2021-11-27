@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -52,17 +51,13 @@ func dataSourceUserGroup() *schema.Resource {
 func dataSourceUserGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	userGroup, err := c.GetUserGroup(d.Get("name").(string))
+	userGroupName := d.Get("name").(string)
+	userGroup, err := c.GetUserGroup(userGroupName)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
 	if userGroup == nil {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "User group not found",
-			Detail:   fmt.Sprintf("User group not found"),
-		})
-		return diags
+		return append(diags, diag.Errorf("User group with name %s was not found", userGroupName)...)
 	}
 	d.Set("user_group_id", userGroup.Id)
 	d.Set("name", userGroup.Name)
