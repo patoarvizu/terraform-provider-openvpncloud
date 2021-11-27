@@ -67,26 +67,6 @@ func (c *Client) GetConnectorsForNetwork(networkId string) ([]Connector, error) 
 	return networkConnectors, nil
 }
 
-func (c *Client) UpdateNetworkConnectors(network Network) error {
-	for _, conn := range network.Connectors {
-		if len(conn.Id) == 0 {
-			connJson, err := json.Marshal(conn)
-			if err != nil {
-				return err
-			}
-			req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/connectors?networkItemId=%s&networkItemType=NETWORK", c.BaseURL, network.Id), bytes.NewBuffer(connJson))
-			if err != nil {
-				return err
-			}
-			_, err = c.DoRequest(req)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (c *Client) AddNetworkConnector(connector Connector, networkId string) (*Connector, error) {
 	connectorJson, err := json.Marshal(connector)
 	if err != nil {
