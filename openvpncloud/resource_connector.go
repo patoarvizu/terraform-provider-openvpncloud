@@ -67,7 +67,11 @@ func resourceConnectorCreate(ctx context.Context, d *schema.ResourceData, m inte
 		return diag.FromErr(err)
 	}
 	d.SetId(conn.Id)
-	return diags
+	return append(diags, diag.Diagnostic{
+		Severity: diag.Warning,
+		Summary:  "Connector needs to be set up manually",
+		Detail:   "Terraform only creates the OpenVPN Cloud connector object, but additional manual steps are required to associate a host in your infrastructure with this connector. Go to https://openvpn.net/cloud-docs/connector/ for more information.",
+	})
 }
 
 func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

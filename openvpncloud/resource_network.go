@@ -143,7 +143,11 @@ func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, m interf
 		"id": defaultRoute.Id,
 	}
 	d.Set("default_route", defaultRouteWithIdSlice)
-	return diags
+	return append(diags, diag.Diagnostic{
+		Severity: diag.Warning,
+		Summary:  "The default connector for this network needs to be set up manually",
+		Detail:   "Terraform only creates the OpenVPN Cloud default connector object for this network, but additional manual steps are required to associate a host in your infrastructure with this connector. Go to https://openvpn.net/cloud-docs/connector/ for more information.",
+	})
 }
 
 func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
