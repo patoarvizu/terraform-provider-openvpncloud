@@ -24,7 +24,7 @@ const (
 	InternetAccessLocal          = "LOCAL"
 )
 
-func (c *Client) GetNetworkByName(name string) (*Network, error) {
+func (c *Client) GetNetworks() ([]Network, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/networks", c.BaseURL), nil)
 	if err != nil {
 		return nil, err
@@ -35,6 +35,14 @@ func (c *Client) GetNetworkByName(name string) (*Network, error) {
 	}
 	var networks []Network
 	err = json.Unmarshal(body, &networks)
+	if err != nil {
+		return nil, err
+	}
+	return networks, nil
+}
+
+func (c *Client) GetNetworkByName(name string) (*Network, error) {
+	networks, err := c.GetNetworks()
 	if err != nil {
 		return nil, err
 	}

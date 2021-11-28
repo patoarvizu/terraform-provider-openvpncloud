@@ -177,21 +177,28 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 		return append(diags, diag.FromErr(err)...)
 	}
 	configRoute := d.Get("default_route").([]interface{})[0].(map[string]interface{})
-	route, err := c.GetRoute(d.Id(), configRoute["id"].(string))
-	defaultRoute := []map[string]interface{}{
-		{
-			"id":   configRoute["id"].(string),
-			"type": route.Type,
-		},
-	}
-	if route.Type == client.RouteTypeIPV4 || route.Type == client.RouteTypeIPV6 {
-		defaultRoute[0]["value"] = route.Subnet
-	} else if route.Type == client.RouteTypeDomain {
-		defaultRoute[0]["value"] = route.Domain
-	}
-	err = d.Set("default_route", defaultRoute)
+	route, err := c.GetNetworkRoute(d.Id(), configRoute["id"].(string))
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
+	}
+	if route == nil {
+		d.SetId("")
+	} else {
+		defaultRoute := []map[string]interface{}{
+			{
+				"id":   configRoute["id"].(string),
+				"type": route.Type,
+			},
+		}
+		if route.Type == client.RouteTypeIPV4 || route.Type == client.RouteTypeIPV6 {
+			defaultRoute[0]["value"] = route.Subnet
+		} else if route.Type == client.RouteTypeDomain {
+			defaultRoute[0]["value"] = route.Domain
+		}
+		err = d.Set("default_route", defaultRoute)
+		if err != nil {
+			return append(diags, diag.FromErr(err)...)
+		}
 	}
 	return diags
 }

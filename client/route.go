@@ -8,11 +8,12 @@ import (
 )
 
 type Route struct {
-	Id     string `json:"id"`
-	Type   string `json:"type"`
-	Subnet string `json:"subnet"`
-	Domain string `json:"domain"`
-	Value  string `json:"value"`
+	Id            string `json:"id"`
+	Type          string `json:"type"`
+	Subnet        string `json:"subnet"`
+	Domain        string `json:"domain"`
+	Value         string `json:"value"`
+	NetworkItemId string `json:"networkItemId"`
 }
 
 const (
@@ -68,7 +69,7 @@ func (c *Client) GetRoutes(networkId string) ([]Route, error) {
 	return routes, nil
 }
 
-func (c *Client) GetRoute(networkId string, routeId string) (*Route, error) {
+func (c *Client) GetNetworkRoute(networkId string, routeId string) (*Route, error) {
 	routes, err := c.GetRoutes(networkId)
 	if err != nil {
 		return nil, err
@@ -76,6 +77,24 @@ func (c *Client) GetRoute(networkId string, routeId string) (*Route, error) {
 	for _, r := range routes {
 		if r.Id == routeId {
 			return &r, nil
+		}
+	}
+	return nil, nil
+}
+
+func (c *Client) GetRouteById(routeId string) (*Route, error) {
+	networks, err := c.GetNetworks()
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range networks {
+		r, err := c.GetNetworkRoute(n.Id, routeId)
+		if err != nil {
+			return nil, err
+		}
+		if r != nil {
+			r.NetworkItemId = n.Id
+			return r, nil
 		}
 	}
 	return nil, nil

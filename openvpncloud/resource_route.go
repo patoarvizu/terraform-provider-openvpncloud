@@ -14,6 +14,9 @@ func resourceRoute() *schema.Resource {
 		CreateContext: resourceRouteCreate,
 		ReadContext:   resourceRouteRead,
 		DeleteContext: resourceRouteDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"type": {
 				Type:         schema.TypeString,
@@ -62,8 +65,7 @@ func resourceRouteRead(ctx context.Context, d *schema.ResourceData, m interface{
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	routeId := d.Id()
-	networkItemId := d.Get("network_item_id").(string)
-	r, err := c.GetRoute(networkItemId, routeId)
+	r, err := c.GetRouteById(routeId)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
@@ -76,7 +78,7 @@ func resourceRouteRead(ctx context.Context, d *schema.ResourceData, m interface{
 		} else if r.Type == client.RouteTypeDomain {
 			d.Set("resourceRouteRead", r.Domain)
 		}
-		d.Set("network_item_id", networkItemId)
+		d.Set("network_item_id", r.NetworkItemId)
 	}
 	return diags
 }
