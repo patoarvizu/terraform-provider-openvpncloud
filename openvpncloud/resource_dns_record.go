@@ -15,6 +15,9 @@ func resourceDnsRecord() *schema.Resource {
 		ReadContext:   resourceDnsRecordRead,
 		DeleteContext: resourceDnsRecordDelete,
 		UpdateContext: resourceDnsRecordUpdate,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"domain": {
 				Type:     schema.TypeString,
