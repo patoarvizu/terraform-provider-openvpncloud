@@ -91,15 +91,9 @@ func resourceDnsRecordUpdate(ctx context.Context, d *schema.ResourceData, m inte
 	var diags diag.Diagnostics
 	_, domain := d.GetChange("domain")
 	_, ipV4Addresses := d.GetChange("ip_v4_addresses")
-	ipV4AddressesSlice := make([]string, 0)
-	for _, a := range ipV4Addresses.([]interface{}) {
-		ipV4AddressesSlice = append(ipV4AddressesSlice, a.(string))
-	}
+	ipV4AddressesSlice := getAddressesSlice(ipV4Addresses.([]interface{}))
 	_, ipV6Addresses := d.GetChange("ip_v6_addresses")
-	ipV6AddressesSlice := make([]string, 0)
-	for _, a := range ipV6Addresses.([]interface{}) {
-		ipV6AddressesSlice = append(ipV6AddressesSlice, a.(string))
-	}
+	ipV6AddressesSlice := getAddressesSlice(ipV6Addresses.([]interface{}))
 	dr := client.DnsRecord{
 		Id:            d.Id(),
 		Domain:        domain.(string),
@@ -122,4 +116,12 @@ func resourceDnsRecordDelete(ctx context.Context, d *schema.ResourceData, m inte
 		return append(diags, diag.FromErr(err)...)
 	}
 	return diags
+}
+
+func getAddressesSlice(addresses []interface{}) []string {
+	addressesSlice := make([]string, 0)
+	for _, a := range addresses {
+		addressesSlice = append(addressesSlice, a.(string))
+	}
+	return addressesSlice
 }
