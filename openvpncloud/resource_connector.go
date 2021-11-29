@@ -2,7 +2,6 @@ package openvpncloud
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -15,6 +14,9 @@ func resourceConnector() *schema.Resource {
 		CreateContext: resourceConnectorCreate,
 		ReadContext:   resourceConnectorRead,
 		DeleteContext: resourceConnectorDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -77,16 +79,12 @@ func resourceConnectorCreate(ctx context.Context, d *schema.ResourceData, m inte
 func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	connector, err := c.GetConnectorByName(d.Get("name").(string))
+	connector, err := c.GetConnectorById(d.Id())
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
 	if connector == nil {
 		d.SetId("")
-		return append(diags, diag.Diagnostic{
-			Severity: diag.Warning,
-			Summary:  fmt.Sprintf("Connector with name %s not found", d.Get("name").(string)),
-		})
 	} else {
 		d.SetId(connector.Id)
 		d.Set("name", connector.Name)

@@ -22,7 +22,7 @@ const (
 	NetworkItemTypeNetwork = "NETWORK"
 )
 
-func (c *Client) GetConnectorByName(name string) (*Connector, error) {
+func (c *Client) GetConnectors() ([]Connector, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/api/beta/connectors", c.BaseURL), nil)
 	if err != nil {
 		return nil, err
@@ -36,8 +36,29 @@ func (c *Client) GetConnectorByName(name string) (*Connector, error) {
 	if err != nil {
 		return nil, err
 	}
+	return connectors, nil
+}
+
+func (c *Client) GetConnectorByName(name string) (*Connector, error) {
+	connectors, err := c.GetConnectors()
+	if err != nil {
+		return nil, err
+	}
 	for _, c := range connectors {
 		if c.Name == name {
+			return &c, nil
+		}
+	}
+	return nil, nil
+}
+
+func (c *Client) GetConnectorById(connectorId string) (*Connector, error) {
+	connectors, err := c.GetConnectors()
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range connectors {
+		if c.Id == connectorId {
 			return &c, nil
 		}
 	}
