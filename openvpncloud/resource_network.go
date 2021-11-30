@@ -15,6 +15,9 @@ func resourceNetwork() *schema.Resource {
 		ReadContext:   resourceNetworkRead,
 		UpdateContext: resourceNetworkUpdate,
 		DeleteContext: resourceNetworkDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
@@ -153,7 +156,7 @@ func resourceNetworkCreate(ctx context.Context, d *schema.ResourceData, m interf
 func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	network, err := c.GetNetworkByName(d.Get("name").(string))
+	network, err := c.GetNetworkById(d.Id())
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
@@ -166,38 +169,39 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 	d.Set("egress", network.Egress)
 	d.Set("internet_access", network.InternetAccess)
 	d.Set("system_subnets", network.SystemSubnets)
-	configConnector := d.Get("default_connector").([]interface{})[0].(map[string]interface{})
-	connectorName := configConnector["name"].(string)
-	networkConnectors, err := c.GetConnectorsForNetwork(network.Id)
-	if err != nil {
-		return append(diags, diag.FromErr(err)...)
-	}
-	err = d.Set("default_connector", getNetworkConnectorSlice(networkConnectors, network.Id, connectorName))
-	if err != nil {
-		return append(diags, diag.FromErr(err)...)
-	}
-	configRoute := d.Get("default_route").([]interface{})[0].(map[string]interface{})
-	route, err := c.GetNetworkRoute(d.Id(), configRoute["id"].(string))
-	if err != nil {
-		return append(diags, diag.FromErr(err)...)
-	}
-	if route == nil {
-		d.SetId("")
-	} else {
-		defaultRoute := []map[string]interface{}{
-			{
-				"id":   configRoute["id"].(string),
-				"type": route.Type,
-			},
-		}
-		if route.Type == client.RouteTypeIPV4 || route.Type == client.RouteTypeIPV6 {
-			defaultRoute[0]["value"] = route.Subnet
-		} else if route.Type == client.RouteTypeDomain {
-			defaultRoute[0]["value"] = route.Domain
-		}
-		err = d.Set("default_route", defaultRoute)
+	if len(d.Get("default_connector").([]interface{})) > 0 {
+		configConnector := d.Get("default_connector").([]interface{})[0].(map[string]interface{})
+		connectorName := configConnector["name"].(string)
+		networkConnectors, err := c.GetConnectorsForNetwork(network.Id)
 		if err != nil {
 			return append(diags, diag.FromErr(err)...)
+		}
+		err = d.Set("default_connector", getNetworkConnectorSlice(networkConnectors, network.Id, connectorName))
+		if err != nil {
+			return append(diags, diag.FromErr(err)...)
+		}
+	}
+	if len(d.Get("default_route").([]interface{})) > 0 {
+		configRoute := d.Get("default_route").([]interface{})[0].(map[string]interface{})
+		route, err := c.GetNetworkRoute(d.Id(), configRoute["id"].(string))
+		if err != nil {
+			return append(diags, diag.FromErr(err)...)
+		}
+		if route == nil {
+			d.Set("default_route", []map[string]interface{}{})
+		} else {
+			defaultRoute := []map[string]interface{}{
+				{
+					"id":   configRoute["id"].(string),
+					"type": route.Type,
+				},
+			}
+			if route.Type == client.RouteTypeIPV4 || route.Type == client.RouteTypeIPV6 {
+				defaultRoute[0]["value"] = route.Subnet
+			} else if route.Type == client.RouteTypeDomain {
+				defaultRoute[0]["value"] = route.Domain
+			}
+			d.Set("default_route", defaultRoute)
 		}
 	}
 	return diags
@@ -207,40 +211,82 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	if d.HasChange("default_connector") {
-		o, n := d.GetChange("default_connector")
-		old := o.([]interface{})[0].(map[string]interface{})
-		new := n.([]interface{})[0].(map[string]interface{})
-		if old["name"].(string) != new["name"].(string) || old["vpn_region_id"].(string) != new["vpn_region_id"].(string) {
+		old, new := d.GetChange("default_connector")
+		oldSlice := old.([]interface{})
+		newSlice := new.([]interface{})
+		if len(oldSlice) == 0 && len(newSlice) == 1 {
+			// This happens when importing the resource
 			newConnector := client.Connector{
-				Name:        new["name"].(string),
-				VpnRegionId: new["vpn_region_id"].(string),
+				Name:            newSlice[0].(map[string]interface{})["name"].(string),
+				VpnRegionId:     newSlice[0].(map[string]interface{})["vpn_region_id"].(string),
+				NetworkItemType: client.NetworkItemTypeNetwork,
 			}
 			_, err := c.AddNetworkConnector(newConnector, d.Id())
 			if err != nil {
 				return append(diags, diag.FromErr(err)...)
 			}
-			err = c.DeleteNetworkConnector(old["id"].(string), d.Id(), old["network_item_type"].(string))
-			if err != nil {
-				return append(diags, diag.FromErr(err)...)
+		} else {
+			oldMap := oldSlice[0].(map[string]interface{})
+			newMap := newSlice[0].(map[string]interface{})
+			if oldMap["name"].(string) != newMap["name"].(string) || oldMap["vpn_region_id"].(string) != newMap["vpn_region_id"].(string) {
+				newConnector := client.Connector{
+					Name:            newMap["name"].(string),
+					VpnRegionId:     newMap["vpn_region_id"].(string),
+					NetworkItemType: client.NetworkItemTypeNetwork,
+				}
+				_, err := c.AddNetworkConnector(newConnector, d.Id())
+				if err != nil {
+					return append(diags, diag.FromErr(err)...)
+				}
+				if len(oldMap["id"].(string)) > 0 {
+					// This can sometimes happen when importing the resource
+					err = c.DeleteNetworkConnector(oldMap["id"].(string), d.Id(), oldMap["network_item_type"].(string))
+					if err != nil {
+						return append(diags, diag.FromErr(err)...)
+					}
+				}
 			}
 		}
 	}
 	if d.HasChange("default_route") {
-		o, n := d.GetChange("default_route")
-		old := o.([]interface{})[0].(map[string]interface{})
-		new := n.([]interface{})[0].(map[string]interface{})
-		networkId := d.Id()
-		routeId := old["id"]
-		routeType := new["type"]
-		routeValue := new["value"]
-		route := client.Route{
-			Id:    routeId.(string),
-			Type:  routeType.(string),
-			Value: routeValue.(string),
-		}
-		err := c.UpdateRoute(networkId, route)
-		if err != nil {
-			diags = append(diags, diag.FromErr(err)...)
+		old, new := d.GetChange("default_route")
+		oldSlice := old.([]interface{})
+		newSlice := new.([]interface{})
+		if len(oldSlice) == 0 && len(newSlice) == 1 {
+			// This happens when importing the resource
+			newMap := newSlice[0].(map[string]interface{})
+			routeType := newMap["type"]
+			routeValue := newMap["value"]
+			route := client.Route{
+				Type:  routeType.(string),
+				Value: routeValue.(string),
+			}
+			defaultRoute, err := c.CreateRoute(d.Id(), route)
+			if err != nil {
+				return append(diags, diag.FromErr(err)...)
+			}
+			defaultRouteWithIdSlice := make([]map[string]interface{}, 1)
+			defaultRouteWithIdSlice[0] = map[string]interface{}{
+				"id": defaultRoute.Id,
+			}
+			err = d.Set("default_route", defaultRouteWithIdSlice)
+			if err != nil {
+				diags = append(diags, diag.FromErr(err)...)
+			}
+		} else {
+			newMap := newSlice[0].(map[string]interface{})
+			routeId := newMap["id"]
+			routeType := newMap["type"]
+			routeValue := newMap["value"]
+			route := client.Route{
+				Id:    routeId.(string),
+				Type:  routeType.(string),
+				Value: routeValue.(string),
+			}
+			err := c.UpdateRoute(d.Id(), route)
+			if err != nil {
+				diags = append(diags, diag.FromErr(err)...)
+			}
 		}
 	}
 	if d.HasChanges("name", "description", "internet_access", "egress") {
@@ -273,6 +319,9 @@ func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func getNetworkConnectorSlice(networkConnectors []client.Connector, networkId string, connectorName string) []interface{} {
+	if len(networkConnectors) == 0 {
+		return nil
+	}
 	connectorsList := make([]interface{}, 1)
 	for _, c := range networkConnectors {
 		if c.NetworkItemId == networkId && c.Name == connectorName {

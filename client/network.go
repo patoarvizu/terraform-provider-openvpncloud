@@ -54,6 +54,19 @@ func (c *Client) GetNetworkByName(name string) (*Network, error) {
 	return nil, nil
 }
 
+func (c *Client) GetNetworkById(networkId string) (*Network, error) {
+	networks, err := c.GetNetworks()
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range networks {
+		if n.Id == networkId {
+			return &n, nil
+		}
+	}
+	return nil, nil
+}
+
 func (c *Client) CreateNetwork(network Network) (*Network, error) {
 	networkJson, err := json.Marshal(network)
 	if err != nil {
