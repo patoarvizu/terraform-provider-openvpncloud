@@ -25,4 +25,10 @@ Use `openvpncloud_route` to create a route on an OpenVPN Cloud network.
 
 - **id** (String) The ID of this resource.
 
+## Import
 
+A route can be imported using the route ID, which can be fetched directly from the API.
+
+```
+terraform import openvpncloud_route.route <route-uuid>
+```

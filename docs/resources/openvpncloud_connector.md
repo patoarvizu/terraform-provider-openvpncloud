@@ -29,3 +29,13 @@ Use `openvpncloud_connector` to create an OpenVPN Cloud connector.
 - **id** (String) The ID of this resource.
 - **ip_v4_address** (String) The IPV4 address of the connector.
 - **ip_v6_address** (String) The IPV6 address of the connector.
+
+## Import
+
+A connector can be imported using the connector ID, which can be fetched directly from the API.
+
+```
+terraform import openvpncloud_connector.connector <connector-uuid>
+```
+
+~> NOTE: If the Terraform resource settings are different from the imported connector, the next time you run `terraform apply` the provider will attempt to delete and recreate the connector, which will require you to re-configure the instance manually.
