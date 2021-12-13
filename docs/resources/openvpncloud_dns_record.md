@@ -27,3 +27,11 @@ Use `openvpncloud_dns_record` to create a DNS record on your VPN.
 ### Read-Only
 
 - **id** (String) The ID of this resource.
+
+## Import
+
+A connector can be imported using the DNS record ID, which can be fetched directly from the API.
+
+```
+terraform import openvpncloud_dns_record.record <record-uuid>
+```
