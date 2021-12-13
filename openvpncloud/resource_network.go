@@ -309,12 +309,13 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceNetworkDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	diags = append(diags, diag.Diagnostic{
-		Severity: diag.Warning,
-		Summary:  "Deleting an openvpncloud_network resource is not supported.",
-		Detail:   "Deleting a network is not supported by the OpenVPN cloud API yet. This operation only removed it from the Terraform state, but you'll need to manually delete it from the web console.",
-	})
+	networkId := d.Id()
+	err := c.DeleteNetwork(networkId)
+	if err != nil {
+		return append(diags, diag.FromErr(err)...)
+	}
 	return diags
 }
 

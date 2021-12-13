@@ -100,3 +100,12 @@ func (c *Client) UpdateNetwork(network Network) error {
 	_, err = c.DoRequest(req)
 	return err
 }
+
+func (c *Client) DeleteNetwork(networkId string) error {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/api/beta/networks/%s", c.BaseURL, networkId), nil)
+	if err != nil {
+		return err
+	}
+	_, err = c.DoRequest(req)
+	return err
+}

@@ -1,7 +1,7 @@
 HOSTNAME=patoarvizu.dev
 NAMESPACE=openvpn
 NAME=openvpncloud
-VERSION=0.0.1
+VERSION=0.0.2
 BINARY=terraform-provider-${NAME}
 OS_ARCH=darwin_amd64
 
