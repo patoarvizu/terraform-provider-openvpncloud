@@ -27,7 +27,7 @@ description: |-
 - `devices` (Block List, Max: 1) (see [below for nested schema](#nestedblock--devices)). When a user signs in, the device that they use will be added to their account. You can read more at [OpenVPN Cloud Device](https://openvpn.net/cloud-docs/device/).
 - `group_id` (String). The UUID of a user's group.
 - `id` (String) The ID of this resource.
-- `role` (String). It should be either MEMBER or ADMIN. By default, all users are created as members.
+- `role` (String). At the moment, it can only be MEMBER. There is a bug in OpenVPN Cloud API that prevents setting the user's role during the creation. Once it's fixed, the provider will be updated accordingly.
 
 <a id="nestedblock--devices"></a>
 ### Nested Schema for `devices`

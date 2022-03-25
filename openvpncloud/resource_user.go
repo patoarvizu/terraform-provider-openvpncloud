@@ -24,12 +24,13 @@ func resourceUser() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(1, 120),
 			},
-			// Whatever value you set for role, it will be ignored during creation.
-			// You will need to set it once the resource is created to prevent recreation.
+			// OpenVPN Cloud API has a bug that does not allow setting the role during the user's creation
 			"role": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ForceNew:     true,
+				Default:      "MEMBER",
+				ValidateFunc: validation.StringInSlice([]string{"MEMBER"}, false),
 			},
 			"email": {
 				Type:         schema.TypeString,
@@ -124,7 +125,11 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		return append(diags, diag.FromErr(err)...)
 	}
 	d.SetId(user.Id)
-	return diags
+	return append(diags, diag.Diagnostic{
+		Severity: diag.Warning,
+		Summary:  "The user's role cannot be changed using the code.",
+		Detail:   "There is a bug in OpenVPN Cloud API that prevents setting the user's role during the creation. All users are created as Members by default. Once it's fixed, the provider will be updated accordingly.",
+	})
 }
 
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
