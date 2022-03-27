@@ -24,14 +24,6 @@ func resourceUser() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validation.StringLenBetween(1, 120),
 			},
-			// OpenVPN Cloud API has a bug that does not allow setting the role during the user's creation
-			"role": {
-				Type:         schema.TypeString,
-				Optional:     true,
-				ForceNew:     true,
-				Default:      "MEMBER",
-				ValidateFunc: validation.StringInSlice([]string{"MEMBER"}, false),
-			},
 			"email": {
 				Type:         schema.TypeString,
 				Required:     true,
@@ -91,7 +83,8 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	username := d.Get("username").(string)
-	role := d.Get("role").(string)
+	// OpenVPN Cloud API has a bug that does not allow setting the role during the user's creation
+	role := "MEMBER"
 	email := d.Get("email").(string)
 	firstName := d.Get("first_name").(string)
 	lastName := d.Get("last_name").(string)
@@ -144,7 +137,6 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		d.SetId("")
 	} else {
 		d.Set("username", u.Username)
-		d.Set("role", u.Role)
 		d.Set("email", u.Email)
 		d.Set("first_name", u.FirstName)
 		d.Set("last_name", u.LastName)
