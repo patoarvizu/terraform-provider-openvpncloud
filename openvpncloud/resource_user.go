@@ -83,8 +83,6 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	username := d.Get("username").(string)
-	// OpenVPN Cloud API has a bug that does not allow setting the role during the user's creation
-	role := "MEMBER"
 	email := d.Get("email").(string)
 	firstName := d.Get("first_name").(string)
 	lastName := d.Get("last_name").(string)
@@ -106,7 +104,6 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	u := client.User{
 		Username:  username,
-		Role:      role,
 		Email:     email,
 		FirstName: firstName,
 		LastName:  lastName,
