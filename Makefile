@@ -3,7 +3,7 @@ NAMESPACE=openvpn
 NAME=openvpncloud
 VERSION=0.0.4
 BINARY=terraform-provider-${NAME}
-OS_ARCH=darwin_amd64
+OS_ARCH=darwin_arm64
 
 default: install
 
