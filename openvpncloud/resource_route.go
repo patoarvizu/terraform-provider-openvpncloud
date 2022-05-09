@@ -84,6 +84,7 @@ func resourceRouteRead(ctx context.Context, d *schema.ResourceData, m interface{
 		d.SetId("")
 	} else {
 		d.Set("type", r.Type)
+		d.Set("description", r.Description)
 		if r.Type == client.RouteTypeIPV4 || r.Type == client.RouteTypeIPV6 {
 			d.Set("value", r.Subnet)
 		} else if r.Type == client.RouteTypeDomain {
