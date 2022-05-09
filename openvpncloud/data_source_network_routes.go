@@ -31,6 +31,10 @@ func dataSourceNetworkRoutes() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"description": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},
@@ -50,6 +54,7 @@ func dataSourceNetworkRoutesRead(ctx context.Context, d *schema.ResourceData, m 
 		route := make(map[string]interface{})
 		routeType := r.Type
 		route["type"] = routeType
+		route["description"] = r.Description
 		if routeType == client.RouteTypeIPV4 || routeType == client.RouteTypeIPV6 {
 			route["value"] = r.Subnet
 		} else if routeType == client.RouteTypeDomain {

@@ -21,6 +21,10 @@ Use `openvpncloud_route` to create a route on an OpenVPN Cloud network.
 - **type** (String) The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.
 - **value** (String) The target value of the default route.
 
+### Optional
+
+- **description** (String) Route description
+
 ### Read-Only
 
 - **id** (String) The ID of this resource.

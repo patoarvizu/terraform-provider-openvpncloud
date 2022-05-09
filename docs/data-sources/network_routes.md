@@ -31,5 +31,6 @@ Read-Only:
 
 - **type** (String) The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.
 - **value** (String) The value of the route, either an IPV4 address, an IPV6 address, or a DNS hostname.
+- **description** (String) The description of the route.
 
 

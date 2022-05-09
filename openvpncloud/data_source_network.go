@@ -54,6 +54,10 @@ func dataSourceNetwork() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"description": {
+							Type:     schema.TypeString,
+							Computed: true,
+						},
 					},
 				},
 			},
@@ -127,6 +131,7 @@ func getRoutesSlice(networkRoutes *[]client.Route) []interface{} {
 		route["id"] = r.Id
 		route["subnet"] = r.Subnet
 		route["type"] = r.Type
+		route["description"] = r.Description
 		routes[i] = route
 	}
 	return routes
