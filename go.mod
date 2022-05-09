@@ -1,6 +1,6 @@
 module github.com/patoarvizu/terraform-provider-openvpn-cloud
 
-go 1.18
+go 1.17
 
 require (
 	github.com/hashicorp/terraform-plugin-log v0.3.0
