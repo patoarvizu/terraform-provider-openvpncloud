@@ -2,6 +2,8 @@ package openvpncloud
 
 import (
 	"context"
+	"fmt"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -12,6 +14,7 @@ import (
 func resourceRoute() *schema.Resource {
 	return &schema.Resource{
 		CreateContext: resourceRouteCreate,
+		UpdateContext: resourceRouteCreate,
 		ReadContext:   resourceRouteRead,
 		DeleteContext: resourceRouteDelete,
 		Importer: &schema.ResourceImporter{
@@ -34,6 +37,10 @@ func resourceRoute() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -44,10 +51,14 @@ func resourceRouteCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	networkItemId := d.Get("network_item_id").(string)
 	routeType := d.Get("type").(string)
 	routeValue := d.Get("value").(string)
+	descriptionValue := d.Get("description").(string)
 	r := client.Route{
-		Type:  routeType,
-		Value: routeValue,
+		Type:        routeType,
+		Value:       routeValue,
+		Description: descriptionValue,
 	}
+
+	tflog.Debug(ctx, fmt.Sprintf("%s: route", routeValue))
 	route, err := c.CreateRoute(networkItemId, r)
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
