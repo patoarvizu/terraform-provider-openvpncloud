@@ -115,7 +115,7 @@ func dataSourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interf
 	d.Set("internet_access", network.InternetAccess)
 	d.Set("system_subnets", network.SystemSubnets)
 	d.Set("routes", getRoutesSlice(&network.Routes))
-	d.Set("connectors", getNetworkConnectorsSlice(&network.Connectors))
+	d.Set("connectors", getConnectorsSlice(&network.Connectors))
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	return diags
 }
@@ -132,9 +132,9 @@ func getRoutesSlice(networkRoutes *[]client.Route) []interface{} {
 	return routes
 }
 
-func getNetworkConnectorsSlice(networkConnectors *[]client.Connector) []interface{} {
-	connectors := make([]interface{}, len(*networkConnectors), len(*networkConnectors))
-	for i, c := range *networkConnectors {
+func getConnectorsSlice(connectors *[]client.Connector) []interface{} {
+	conns := make([]interface{}, len(*connectors), len(*connectors))
+	for i, c := range *connectors {
 		connector := make(map[string]interface{})
 		connector["id"] = c.Id
 		connector["name"] = c.Name
@@ -143,7 +143,7 @@ func getNetworkConnectorsSlice(networkConnectors *[]client.Connector) []interfac
 		connector["vpn_region_id"] = c.VpnRegionId
 		connector["ip_v4_address"] = c.IPv4Address
 		connector["ip_v6_address"] = c.IPv6Address
-		connectors[i] = connector
+		conns[i] = connector
 	}
-	return connectors
+	return conns
 }
