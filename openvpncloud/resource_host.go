@@ -2,6 +2,7 @@ package openvpncloud
 
 import (
 	"context"
+	"hash/fnv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -43,9 +44,14 @@ func resourceHost() *schema.Resource {
 				},
 			},
 			"connector": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Required: true,
-				MaxItems: 1,
+				Set: func(i interface{}) int {
+					n := i.(map[string]interface{})["name"]
+					h := fnv.New32a()
+					h.Write([]byte(n.(string)))
+					return int(h.Sum32())
+				},
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -87,8 +93,8 @@ func resourceHostCreate(ctx context.Context, d *schema.ResourceData, m interface
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	var connectors []client.Connector
-	configConnectors := d.Get("connector").([]interface{})
-	for _, c := range configConnectors {
+	configConnectors := d.Get("connector").(*schema.Set)
+	for _, c := range configConnectors.List() {
 		connectors = append(connectors, client.Connector{
 			Name:        c.(map[string]interface{})["name"].(string),
 			VpnRegionId: c.(map[string]interface{})["vpn_region_id"].(string),
@@ -127,13 +133,21 @@ func resourceHostRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	d.Set("description", host.Description)
 	d.Set("internet_access", host.InternetAccess)
 	d.Set("system_subnets", host.SystemSubnets)
-	if len(d.Get("connector").([]interface{})) > 0 {
-		configConnector := d.Get("connector").([]interface{})[0].(map[string]interface{})
-		connectorName := configConnector["name"].(string)
-		err = d.Set("connector", getConnectorSlice(host.Connectors, host.Id, connectorName))
-		if err != nil {
-			return append(diags, diag.FromErr(err)...)
-		}
+	connectorsList := make([]interface{}, 0)
+	for _, conn := range host.Connectors {
+		connector := make(map[string]interface{})
+		connector["id"] = conn.Id
+		connector["name"] = conn.Name
+		connector["network_item_id"] = conn.NetworkItemId
+		connector["network_item_type"] = conn.NetworkItemType
+		connector["vpn_region_id"] = conn.VpnRegionId
+		connector["ip_v4_address"] = conn.IPv4Address
+		connector["ip_v6_address"] = conn.IPv6Address
+		connectorsList = append(connectorsList, connector)
+	}
+	err = d.Set("connector", connectorsList)
+	if err != nil {
+		return append(diags, diag.FromErr(err)...)
 	}
 	return diags
 }
@@ -143,13 +157,13 @@ func resourceHostUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	var diags diag.Diagnostics
 	if d.HasChange("connector") {
 		old, new := d.GetChange("connector")
-		oldSlice := old.([]interface{})
-		newSlice := new.([]interface{})
-		if len(oldSlice) == 0 && len(newSlice) == 1 {
+		oldSet := old.(*schema.Set)
+		newSet := new.(*schema.Set)
+		if oldSet.Len() == 0 && newSet.Len() > 0 {
 			// This happens when importing the resource
 			newConnector := client.Connector{
-				Name:            newSlice[0].(map[string]interface{})["name"].(string),
-				VpnRegionId:     newSlice[0].(map[string]interface{})["vpn_region_id"].(string),
+				Name:            newSet.List()[0].(map[string]interface{})["name"].(string),
+				VpnRegionId:     newSet.List()[0].(map[string]interface{})["vpn_region_id"].(string),
 				NetworkItemType: client.NetworkItemTypeHost,
 			}
 			_, err := c.AddConnector(newConnector, d.Id())
@@ -157,23 +171,24 @@ func resourceHostUpdate(ctx context.Context, d *schema.ResourceData, m interface
 				return append(diags, diag.FromErr(err)...)
 			}
 		} else {
-			oldMap := oldSlice[0].(map[string]interface{})
-			newMap := newSlice[0].(map[string]interface{})
-			if oldMap["name"].(string) != newMap["name"].(string) || oldMap["vpn_region_id"].(string) != newMap["vpn_region_id"].(string) {
-				newConnector := client.Connector{
-					Name:            newMap["name"].(string),
-					VpnRegionId:     newMap["vpn_region_id"].(string),
-					NetworkItemType: client.NetworkItemTypeHost,
-				}
-				_, err := c.AddConnector(newConnector, d.Id())
-				if err != nil {
-					return append(diags, diag.FromErr(err)...)
-				}
-				if len(oldMap["id"].(string)) > 0 {
-					// This can sometimes happen when importing the resource
-					err = c.DeleteConnector(oldMap["id"].(string), d.Id(), oldMap["network_item_type"].(string))
+			for _, o := range oldSet.List() {
+				if !newSet.Contains(o) {
+					err := c.DeleteConnector(o.(map[string]interface{})["id"].(string), d.Id(), client.NetworkItemTypeHost)
 					if err != nil {
-						return append(diags, diag.FromErr(err)...)
+						diags = append(diags, diag.FromErr(err)...)
+					}
+				}
+			}
+			for _, n := range newSet.List() {
+				if !oldSet.Contains(n) {
+					newConnector := client.Connector{
+						Name:            n.(map[string]interface{})["name"].(string),
+						VpnRegionId:     n.(map[string]interface{})["vpn_region_id"].(string),
+						NetworkItemType: client.NetworkItemTypeHost,
+					}
+					_, err := c.AddConnector(newConnector, d.Id())
+					if err != nil {
+						diags = append(diags, diag.FromErr(err)...)
 					}
 				}
 			}
