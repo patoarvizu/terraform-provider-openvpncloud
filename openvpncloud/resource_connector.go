@@ -64,7 +64,7 @@ func resourceConnectorCreate(ctx context.Context, d *schema.ResourceData, m inte
 		NetworkItemType: networkItemType,
 		VpnRegionId:     vpnRegionId,
 	}
-	conn, err := c.AddNetworkConnector(connector, networkItemId)
+	conn, err := c.AddConnector(connector, networkItemId)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -100,9 +100,31 @@ func resourceConnectorRead(ctx context.Context, d *schema.ResourceData, m interf
 func resourceConnectorDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
-	err := c.DeleteNetworkConnector(d.Id(), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
+	err := c.DeleteConnector(d.Id(), d.Get("network_item_id").(string), d.Get("network_item_type").(string))
 	if err != nil {
 		return append(diags, diag.FromErr(err)...)
 	}
 	return diags
+}
+
+func getConnectorSlice(connectors []client.Connector, networkItemId string, connectorName string) []interface{} {
+	if len(connectors) == 0 {
+		return nil
+	}
+	connectorsList := make([]interface{}, 1)
+	for _, c := range connectors {
+		if c.NetworkItemId == networkItemId && c.Name == connectorName {
+			connector := make(map[string]interface{})
+			connector["id"] = c.Id
+			connector["name"] = c.Name
+			connector["network_item_id"] = c.NetworkItemId
+			connector["network_item_type"] = c.NetworkItemType
+			connector["vpn_region_id"] = c.VpnRegionId
+			connector["ip_v4_address"] = c.IPv4Address
+			connector["ip_v6_address"] = c.IPv6Address
+			connectorsList[0] = connector
+			break
+		}
+	}
+	return connectorsList
 }

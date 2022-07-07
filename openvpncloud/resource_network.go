@@ -176,7 +176,7 @@ func resourceNetworkRead(ctx context.Context, d *schema.ResourceData, m interfac
 		if err != nil {
 			return append(diags, diag.FromErr(err)...)
 		}
-		err = d.Set("default_connector", getNetworkConnectorSlice(networkConnectors, network.Id, connectorName))
+		err = d.Set("default_connector", getConnectorSlice(networkConnectors, network.Id, connectorName))
 		if err != nil {
 			return append(diags, diag.FromErr(err)...)
 		}
@@ -221,7 +221,7 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 				VpnRegionId:     newSlice[0].(map[string]interface{})["vpn_region_id"].(string),
 				NetworkItemType: client.NetworkItemTypeNetwork,
 			}
-			_, err := c.AddNetworkConnector(newConnector, d.Id())
+			_, err := c.AddConnector(newConnector, d.Id())
 			if err != nil {
 				return append(diags, diag.FromErr(err)...)
 			}
@@ -234,13 +234,13 @@ func resourceNetworkUpdate(ctx context.Context, d *schema.ResourceData, m interf
 					VpnRegionId:     newMap["vpn_region_id"].(string),
 					NetworkItemType: client.NetworkItemTypeNetwork,
 				}
-				_, err := c.AddNetworkConnector(newConnector, d.Id())
+				_, err := c.AddConnector(newConnector, d.Id())
 				if err != nil {
 					return append(diags, diag.FromErr(err)...)
 				}
 				if len(oldMap["id"].(string)) > 0 {
 					// This can sometimes happen when importing the resource
-					err = c.DeleteNetworkConnector(oldMap["id"].(string), d.Id(), oldMap["network_item_type"].(string))
+					err = c.DeleteConnector(oldMap["id"].(string), d.Id(), oldMap["network_item_type"].(string))
 					if err != nil {
 						return append(diags, diag.FromErr(err)...)
 					}
