@@ -11,6 +11,7 @@ import (
 
 func resourceConnector() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Use `openvpncloud_connector` to create an OpenVPN Cloud connector.\n\n~> NOTE: This only creates the OpenVPN Cloud connector object. Additional manual steps are required to associate a host in your infrastructure with the connector. Go to https://openvpn.net/cloud-docs/connector/ for more information.",
 		CreateContext: resourceConnectorCreate,
 		ReadContext:   resourceConnectorRead,
 		DeleteContext: resourceConnectorDelete,
@@ -19,33 +20,39 @@ func resourceConnector() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The connector display name.",
 			},
 			"vpn_region_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The id of the region where the connector will be deployed.",
 			},
 			"network_item_type": {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{client.NetworkItemTypeHost, client.NetworkItemTypeNetwork}, false),
+				Description:  "The type of network item of the connector. Supported values are `HOST` and `NETWORK`.",
 			},
 			"network_item_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The id of the network with which this connector is associated.",
 			},
 			"ip_v4_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPV4 address of the connector.",
 			},
 			"ip_v6_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPV6 address of the connector.",
 			},
 		},
 	}

@@ -12,6 +12,7 @@ import (
 
 func resourceHost() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Use `openvpncloud_host` to create an OpenVPN Cloud host.",
 		CreateContext: resourceHostCreate,
 		ReadContext:   resourceHostRead,
 		UpdateContext: resourceHostUpdate,
@@ -21,20 +22,23 @@ func resourceHost() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The display name of the host.",
 			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "Managed by Terraform",
 				ValidateFunc: validation.StringLenBetween(1, 120),
+				Description:  "The description for the UI. Defaults to `Managed by Terraform`.",
 			},
 			"internet_access": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      client.InternetAccessLocal,
 				ValidateFunc: validation.StringInSlice([]string{client.InternetAccessBlocked, client.InternetAccessGlobalInternet, client.InternetAccessLocal}, false),
+				Description:  "The type of internet access provided. Valid values are `BLOCKED`, `GLOBAL_INTERNET`, or `LOCAL`. Defaults to `LOCAL`.",
 			},
 			"system_subnets": {
 				Type:     schema.TypeSet,
@@ -42,6 +46,7 @@ func resourceHost() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "The IPV4 and IPV6 subnets automatically assigned to this host.",
 			},
 			"connector": {
 				Type:     schema.TypeSet,
@@ -52,6 +57,7 @@ func resourceHost() *schema.Resource {
 					h.Write([]byte(n.(string)))
 					return int(h.Sum32())
 				},
+				Description: "The set of connectors to be associated with this host. Can be defined more than once.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
@@ -59,28 +65,34 @@ func resourceHost() *schema.Resource {
 							Computed: true,
 						},
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of the connector associated with this host.",
 						},
 						"vpn_region_id": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The id of the region where the connector will be deployed.",
 						},
 						"network_item_type": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The network object type. This typically will be set to `HOST`.",
 						},
 						"network_item_id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The host id.",
 						},
 						"ip_v4_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IPV4 address of the connector.",
 						},
 						"ip_v6_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IPV6 address of the connector.",
 						},
 					},
 				},

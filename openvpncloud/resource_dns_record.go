@@ -11,6 +11,7 @@ import (
 
 func resourceDnsRecord() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Use `openvpncloud_dns_record` to create a DNS record on your VPN.",
 		CreateContext: resourceDnsRecordCreate,
 		ReadContext:   resourceDnsRecordRead,
 		DeleteContext: resourceDnsRecordDelete,
@@ -20,9 +21,10 @@ func resourceDnsRecord() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"domain": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The DNS record name.",
 			},
 			"ip_v4_addresses": {
 				Type:     schema.TypeList,
@@ -31,6 +33,7 @@ func resourceDnsRecord() *schema.Resource {
 					Type:         schema.TypeString,
 					ValidateFunc: validation.IsIPv4Address,
 				},
+				Description: "The list of IPV4 addresses to which this record will resolve.",
 			},
 			"ip_v6_addresses": {
 				Type:     schema.TypeList,
@@ -39,6 +42,7 @@ func resourceDnsRecord() *schema.Resource {
 					Type:         schema.TypeString,
 					ValidateFunc: validation.IsIPv6Address,
 				},
+				Description: "The list of IPV6 addresses to which this record will resolve.",
 			},
 		},
 	}

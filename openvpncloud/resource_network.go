@@ -11,6 +11,7 @@ import (
 
 func resourceNetwork() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Use `openvpncloud_network` to create an OpenVPN Cloud Network.",
 		CreateContext: resourceNetworkCreate,
 		ReadContext:   resourceNetworkRead,
 		UpdateContext: resourceNetworkUpdate,
@@ -20,25 +21,29 @@ func resourceNetwork() *schema.Resource {
 		},
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The display name of the network.",
 			},
 			"description": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      "Managed by Terraform",
 				ValidateFunc: validation.StringLenBetween(1, 120),
+				Description:  "The display description for this resource. Defaults to `Managed by Terraform`.",
 			},
 			"egress": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "Boolean to control whether this network provides an egress or not.",
 			},
 			"internet_access": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				Default:      client.InternetAccessLocal,
 				ValidateFunc: validation.StringInSlice([]string{client.InternetAccessBlocked, client.InternetAccessGlobalInternet, client.InternetAccessLocal}, false),
+				Description:  "The type of internet access provided. Valid values are `BLOCKED`, `GLOBAL_INTERNET`, or `LOCAL`. Defaults to `LOCAL`.",
 			},
 			"system_subnets": {
 				Type:     schema.TypeSet,
@@ -46,11 +51,13 @@ func resourceNetwork() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "The IPV4 and IPV6 subnets automatically assigned to this network.",
 			},
 			"default_route": {
-				Type:     schema.TypeList,
-				Required: true,
-				MaxItems: 1,
+				Type:        schema.TypeList,
+				Required:    true,
+				MaxItems:    1,
+				Description: "The default route of this network.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
@@ -58,51 +65,62 @@ func resourceNetwork() *schema.Resource {
 							Optional:     true,
 							Default:      client.RouteTypeIPV4,
 							ValidateFunc: validation.StringInSlice([]string{client.RouteTypeIPV4, client.RouteTypeIPV6, client.RouteTypeDomain}, false),
+							Description:  "The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.",
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The target value of the default route.",
 						},
 						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The ID of this resource.",
 						},
 					},
 				},
 			},
 			"default_connector": {
-				Type:     schema.TypeList,
-				Required: true,
-				MaxItems: 1,
+				Type:        schema.TypeList,
+				Required:    true,
+				MaxItems:    1,
+				Description: "The default connector of this network.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The ID of this resource.",
 						},
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "Name of the connector automatically created and attached to this network.",
 						},
 						"vpn_region_id": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The id of the region where the default connector will be deployed.",
 						},
 						"network_item_type": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The network object type. This typically will be set to `NETWORK`.",
 						},
 						"network_item_id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The parent network id.",
 						},
 						"ip_v4_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IPV4 address of the default connector.",
 						},
 						"ip_v6_address": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The IPV6 address of the default connector.",
 						},
 					},
 				},

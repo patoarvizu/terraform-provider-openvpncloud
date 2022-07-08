@@ -11,6 +11,7 @@ import (
 
 func resourceRoute() *schema.Resource {
 	return &schema.Resource{
+		Description:   "Use `openvpncloud_route` to create a route on an OpenVPN Cloud network.",
 		CreateContext: resourceRouteCreate,
 		ReadContext:   resourceRouteRead,
 		DeleteContext: resourceRouteDelete,
@@ -23,16 +24,19 @@ func resourceRoute() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{client.RouteTypeIPV4, client.RouteTypeIPV6, client.RouteTypeDomain}, false),
+				Description:  "The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.",
 			},
 			"value": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The target value of the default route.",
 			},
 			"network_item_id": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The id of the network on which to create the route.",
 			},
 		},
 	}
