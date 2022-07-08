@@ -12,15 +12,18 @@ import (
 
 func dataSourceUserGroup() *schema.Resource {
 	return &schema.Resource{
+		Description: "Use an `openvpncloud_user_group` data source to read an OpenVPN Cloud user group.",
 		ReadContext: dataSourceUserGroupRead,
 		Schema: map[string]*schema.Schema{
 			"user_group_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The user group ID.",
 			},
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The user group name.",
 			},
 			"vpn_region_ids": {
 				Type:     schema.TypeList,
@@ -28,14 +31,17 @@ func dataSourceUserGroup() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "The list of VPN region IDs this user group is associated with.",
 			},
 			"internet_access": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The type of internet access provided. Valid values are `BLOCKED`, `GLOBAL_INTERNET`, or `LOCAL`. Defaults to `LOCAL`.",
 			},
 			"max_device": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The maximum number of devices per user.",
 			},
 			"system_subnets": {
 				Type:     schema.TypeList,
@@ -43,6 +49,7 @@ func dataSourceUserGroup() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "The IPV4 and IPV6 addresses of the subnets associated with this user group.",
 			},
 		},
 	}

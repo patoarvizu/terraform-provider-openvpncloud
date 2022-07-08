@@ -3,7 +3,7 @@
 page_title: "openvpncloud_vpn_region Data Source - terraform-provider-openvpncloud"
 subcategory: ""
 description: |-
-  
+  Use a openvpncloud_vpn_region data source to read an OpenVPN Cloud VPN region.
 ---
 
 # openvpncloud_vpn_region (Data Source)
@@ -17,14 +17,14 @@ Use a `openvpncloud_vpn_region` data source to read an OpenVPN Cloud VPN region.
 
 ### Required
 
-- **region_id** (String) The id of the region.
+- `region_id` (String) The id of the region.
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **continent** (String) The continent of the region.
-- **country** (String) The country of the region.
-- **country_iso** (String) The ISO code of the country of the region.
-- **region_name** (String) The name of the region.
+- `continent` (String) The continent of the region.
+- `country` (String) The country of the region.
+- `country_iso` (String) The ISO code of the country of the region.
+- `id` (String) The ID of this resource.
+- `region_name` (String) The name of the region.
 
 

@@ -3,7 +3,7 @@
 page_title: "openvpncloud_connector Data Source - terraform-provider-openvpncloud"
 subcategory: ""
 description: |-
-  
+  Use an openvpncloud_connector data source to read an existing OpenVPN Cloud connector.
 ---
 
 # openvpncloud_connector (Data Source)
@@ -17,15 +17,15 @@ Use an `openvpncloud_connector` data source to read an existing OpenVPN Cloud co
 
 ### Required
 
-- **name** (String) The name of the connector.
+- `name` (String) The name of the connector.
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **ip_v4_address** (String) The IPV4 address of the connector.
-- **ip_v6_address** (String) The IPV6 address of the connector.
-- **network_item_id** (String) The id of the network with which the connector is associated.
-- **network_item_type** (String) The network object type of the connector. This typically will be set to `NETWORK`.
-- **vpn_region_id** (String) The id of the region where the connector is deployed.
+- `id` (String) The ID of this resource.
+- `ip_v4_address` (String) The IPV4 address of the connector.
+- `ip_v6_address` (String) The IPV6 address of the connector.
+- `network_item_id` (String) The id of the network or host with which the connector is associated.
+- `network_item_type` (String) The network object type of the connector. This typically will be set to either `NETWORK` or `HOST`.
+- `vpn_region_id` (String) The id of the region where the connector is deployed.
 
 
