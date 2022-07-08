@@ -12,31 +12,38 @@ import (
 
 func dataSourceConnector() *schema.Resource {
 	return &schema.Resource{
+		Description: "Use an `openvpncloud_connector` data source to read an existing OpenVPN Cloud connector.",
 		ReadContext: dataSourceConnectorRead,
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the connector.",
 			},
 			"network_item_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the network or host with which the connector is associated.",
 			},
 			"network_item_type": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The network object type of the connector. This typically will be set to either `NETWORK` or `HOST`.",
 			},
 			"vpn_region_id": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The id of the region where the connector is deployed.",
 			},
 			"ip_v4_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPV4 address of the connector.",
 			},
 			"ip_v6_address": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The IPV6 address of the connector.",
 			},
 		},
 	}

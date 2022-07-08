@@ -3,7 +3,7 @@
 page_title: "openvpncloud_host Data Source - terraform-provider-openvpncloud"
 subcategory: ""
 description: |-
-  
+  Use an openvpncloud_host data source to read an existing OpenVPN Cloud connector.
 ---
 
 # openvpncloud_host (Data Source)
@@ -17,26 +17,26 @@ Use an `openvpncloud_host` data source to read an existing OpenVPN Cloud connect
 
 ### Required
 
-- **name** (String) The name of the host.
+- `name` (String) The name of the host.
 
 ### Read-Only
 
-- **connectors** (List of Object) (see [below for nested schema](#nestedatt--connectors))
-- **id** (String) The ID of this resource.
-- **internet_access** (String) The type of internet access provided.
-- **system_subnets** (List of String) The IPV4 and IPV6 subnets automatically assigned to this host.
+- `connectors` (List of Object) The list of connectors to be associated with this host. (see [below for nested schema](#nestedatt--connectors))
+- `id` (String) The ID of this resource.
+- `internet_access` (String) The type of internet access provided.
+- `system_subnets` (List of String) The IPV4 and IPV6 subnets automatically assigned to this host.
 
 <a id="nestedatt--connectors"></a>
 ### Nested Schema for `connectors`
 
 Read-Only:
 
-- **id** (String) The connector id.
-- **ip_v4_address** (String) The IPV4 address of the connector.
-- **ip_v6_address** (String) The IPV6 address of the connector.
-- **name** (String) The connector name.
-- **network_item_id** (String) The id of the host with which the connector is associated.
-- **network_item_type** (String) The network object type of the connector. This typically will be set to `HOST`.
-- **vpn_region_id** (String) The id of the region where the connector is deployed.
+- `id` (String) The connector id.
+- `ip_v4_address` (String) The IPV4 address of the connector.
+- `ip_v6_address` (String) The IPV6 address of the connector.
+- `name` (String) The connector name.
+- `network_item_id` (String) The id of the host with which the connector is associated.
+- `network_item_type` (String) The network object type of the connector. This typically will be set to `HOST`.
+- `vpn_region_id` (String) The id of the region where the connector is deployed.
 
 

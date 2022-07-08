@@ -12,24 +12,29 @@ import (
 
 func dataSourceNetworkRoutes() *schema.Resource {
 	return &schema.Resource{
+		Description: "Use an `openvpncloud_network_routes` data source to read all the routes associated with an OpenVPN Cloud network.",
 		ReadContext: dataSourceNetworkRoutesRead,
 		Schema: map[string]*schema.Schema{
 			"network_item_id": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The id of the OpenVPN Cloud network of the routes to be discovered.",
 			},
 			"routes": {
-				Type:     schema.TypeList,
-				Computed: true,
+				Type:        schema.TypeList,
+				Computed:    true,
+				Description: "The list of routes.",
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"type": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.",
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The value of the route, either an IPV4 address, an IPV6 address, or a DNS hostname.",
 						},
 					},
 				},

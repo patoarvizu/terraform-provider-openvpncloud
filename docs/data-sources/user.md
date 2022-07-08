@@ -3,7 +3,7 @@
 page_title: "openvpncloud_user Data Source - terraform-provider-openvpncloud"
 subcategory: ""
 description: |-
-  
+  Use a openvpncloud_user data source to read a specific OpenVPN Cloud user.
 ---
 
 # openvpncloud_user (Data Source)
@@ -17,30 +17,30 @@ Use a `openvpncloud_user` data source to read a specific OpenVPN Cloud user.
 
 ### Required
 
-- **role** (String) The type of user role. Valid values are `ADMIN`, `MEMBER`, or `OWNER`.
-- **username** (String) The username of the user.
+- `role` (String) The type of user role. Valid values are `ADMIN`, `MEMBER`, or `OWNER`.
+- `username` (String) The username of the user.
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **auth_type** (String) The authentication type of the user.
-- **devices** (List of Object) (see [below for nested schema](#nestedatt--devices))
-- **email** (String) The email address of the user.
-- **first_name** (String) The user's first name.
-- **group_id** (String) The user's group id.
-- **last_name** (String) The user's last name.
-- **status** (String) The user's status.
-- **user_id** (String) The ID of this resource.
+- `auth_type` (String) The authentication type of the user.
+- `devices` (List of Object) The list of user devices. (see [below for nested schema](#nestedatt--devices))
+- `email` (String) The email address of the user.
+- `first_name` (String) The user's first name.
+- `group_id` (String) The user's group id.
+- `id` (String) The ID of this resource.
+- `last_name` (String) The user's last name.
+- `status` (String) The user's status.
+- `user_id` (String) The ID of this resource.
 
 <a id="nestedatt--devices"></a>
 ### Nested Schema for `devices`
 
 Read-Only:
 
-- **description** (String) The device's description.
-- **id** (String) The device's id.
-- **ip_v4_address** (String) The device's IPV4 address.
-- **ip_v6_address** (String) The device's IPV6 address.
-- **name** (String) The device's name.
+- `description` (String) The device's description.
+- `id` (String) The device's id.
+- `ip_v4_address` (String) The device's IPV4 address.
+- `ip_v6_address` (String) The device's IPV6 address.
+- `name` (String) The device's name.
 
 

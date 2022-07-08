@@ -3,7 +3,7 @@
 page_title: "openvpncloud_network Data Source - terraform-provider-openvpncloud"
 subcategory: ""
 description: |-
-  
+  Use a openvpncloud_network data source to read an OpenVPN Cloud network.
 ---
 
 # openvpncloud_network (Data Source)
@@ -17,30 +17,30 @@ Use a `openvpncloud_network` data source to read an OpenVPN Cloud network.
 
 ### Required
 
-- **name** (String)
+- `name` (String) The network name.
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **connectors** (List of Object) (see [below for nested schema](#nestedatt--connectors))
-- **egress** (Boolean) Boolean to indicate whether this network provides an egress or not.
-- **internet_access** (String) The type of internet access provided. Valid values are `BLOCKED`, `GLOBAL_INTERNET`, or `LOCAL`. Defaults to `LOCAL`.
-- **network_id** (String) The network ID.
-- **routes** (List of Object) (see [below for nested schema](#nestedatt--routes))
-- **system_subnets** (List of String) The IPV4 and IPV6 subnets automatically assigned to this network.
+- `connectors` (List of Object) The list of connectors associated with this network. (see [below for nested schema](#nestedatt--connectors))
+- `egress` (Boolean) Boolean to indicate whether this network provides an egress or not.
+- `id` (String) The ID of this resource.
+- `internet_access` (String) The type of internet access provided. Valid values are `BLOCKED`, `GLOBAL_INTERNET`, or `LOCAL`. Defaults to `LOCAL`.
+- `network_id` (String) The network ID.
+- `routes` (List of Object) The routes associated with this network. (see [below for nested schema](#nestedatt--routes))
+- `system_subnets` (List of String) The IPV4 and IPV6 subnets automatically assigned to this network.
 
 <a id="nestedatt--connectors"></a>
 ### Nested Schema for `connectors`
 
 Read-Only:
 
-- **id** (String) The connector id.
-- **ip_v4_address** (String) The IPV4 address of the connector.
-- **ip_v6_address** (String) The IPV6 address of the connector.
-- **name** (String) The connector name.
-- **network_item_id** (String) The id of the network with which the connector is associated.
-- **network_item_type** (String) The network object type of the connector. This typically will be set to `NETWORK`.
-- **vpn_region_id** (String) The id of the region where the connector is deployed.
+- `id` (String) The connector id.
+- `ip_v4_address` (String) The IPV4 address of the connector.
+- `ip_v6_address` (String) The IPV6 address of the connector.
+- `name` (String) The connector name.
+- `network_item_id` (String) The id of the network with which the connector is associated.
+- `network_item_type` (String) The network object type of the connector. This typically will be set to `NETWORK`.
+- `vpn_region_id` (String) The id of the region where the connector is deployed.
 
 
 <a id="nestedatt--routes"></a>
@@ -48,8 +48,8 @@ Read-Only:
 
 Read-Only:
 
-- **id** (String) The route id.
-- **subnet** (String) The value of the route, either an IPV4 address, an IPV6 address, or a DNS hostname.
-- **type** (String) The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.
+- `id` (String) The route id.
+- `subnet` (String) The value of the route, either an IPV4 address, an IPV6 address, or a DNS hostname.
+- `type` (String) The type of route. Valid values are `IP_V4`, `IP_V6`, and `DOMAIN`.
 
 

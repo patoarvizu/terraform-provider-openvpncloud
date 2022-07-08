@@ -12,27 +12,33 @@ import (
 
 func dataSourceVpnRegion() *schema.Resource {
 	return &schema.Resource{
+		Description: "Use a `openvpncloud_vpn_region` data source to read an OpenVPN Cloud VPN region.",
 		ReadContext: dataSourceVpnRegionRead,
 		Schema: map[string]*schema.Schema{
 			"region_id": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The id of the region.",
 			},
 			"continent": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The continent of the region.",
 			},
 			"country": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The country of the region.",
 			},
 			"country_iso": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The ISO code of the country of the region.",
 			},
 			"region_name": {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the region.",
 			},
 		},
 	}
